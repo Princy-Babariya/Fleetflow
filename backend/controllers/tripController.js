@@ -2,9 +2,28 @@ const Trip = require("../models/Trip");
 const Vehicle = require("../models/Vehicle");
 const Driver = require("../models/Driver");
 
+exports.listTrips = async (req, res) => {
+    try {
+        const trips = await Trip.find().populate("vehicleId").populate("driverId");
+        res.json(trips);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getTripById = async (req, res) => {
+    try {
+        const trip = await Trip.findById(req.params.tripId).populate("vehicleId").populate("driverId");
+        if (!trip) return res.status(404).json({ message: "Trip not found" });
+        res.json(trip);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 exports.createTrip = async (req, res) => {
     try {
-        const { vehicleId, driverId, cargoWeight, revenue, startOdometer } = req.body;
+        const { vehicleId, driverId, cargoWeight, revenue, startOdometer, origin, destination, schedule } = req.body;
 
         const vehicle = await Vehicle.findById(vehicleId);
         const driver = await Driver.findById(driverId);
@@ -30,6 +49,9 @@ exports.createTrip = async (req, res) => {
             cargoWeight,
             revenue,
             startOdometer,
+            origin: origin || "Not specified",
+            destination: destination || "Not specified",
+            schedule: schedule || new Date(),
             status: "Dispatched"
         });
 
@@ -39,8 +61,19 @@ exports.createTrip = async (req, res) => {
         await vehicle.save();
         await driver.save();
 
-        res.json(trip);
+        res.status(201).json(trip);
 
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.updateTrip = async (req, res) => {
+    try {
+        const { tripId } = req.params;
+        const trip = await Trip.findByIdAndUpdate(tripId, req.body, { new: true });
+        if (!trip) return res.status(404).json({ message: "Trip not found" });
+        res.json(trip);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -90,6 +123,16 @@ exports.completeTrip = async (req, res) => {
             distanceTravelled: distance
         });
 
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.deleteTrip = async (req, res) => {
+    try {
+        const trip = await Trip.findByIdAndDelete(req.params.tripId);
+        if (!trip) return res.status(404).json({ message: "Trip not found" });
+        res.json({ message: "Trip deleted successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

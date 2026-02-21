@@ -23,6 +23,9 @@ app.use("/api/trips", require("./routes/tripRoutes"));
 app.use("/api/maintenance", require("./routes/maintenanceRoutes"));
 app.use("/api/fuel", require("./routes/fuelRoutes"));
 
+// Analytics
+app.use("/api/analytics", require("./routes/analyticsRoutes"));
+
 // Websocket POST endpoint to accept location updates from devices or services
 app.use("/ws", require("./routes/wsRoutes"));
 

@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --radius: 12px;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+.card { @apply bg-white rounded-xl shadow-soft p-6 }
+
+/* small utility */
+.font-inter { font-family: Inter, sans-serif }
